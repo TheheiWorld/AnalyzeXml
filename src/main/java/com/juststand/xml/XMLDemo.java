@@ -24,6 +24,11 @@ import java.util.*;
 public class XMLDemo {
 
     private Map<String, Object> map = new LinkedHashMap<String, Object>();
+
+    /**
+     * 无效
+     * @throws Exception
+     */
     @Test
     public void analyzeXml () throws Exception {
         SAXReader reader = new SAXReader();
@@ -37,6 +42,11 @@ public class XMLDemo {
         }
     }
 
+    /**
+     * 无效
+     * @param element
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private Object analyzeElement(Element element) {
 
