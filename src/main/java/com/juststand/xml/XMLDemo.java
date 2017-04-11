@@ -1,7 +1,7 @@
 package com.juststand.xml;
 
 import com.alibaba.fastjson.JSON;
-import com.juststand.xml.domain.InterBOSS;
+import com.juststand.xml.dto.InterBOSS;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
