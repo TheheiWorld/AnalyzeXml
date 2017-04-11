@@ -3,8 +3,6 @@ package com.juststand.xml;
 import com.alibaba.fastjson.JSON;
 import com.juststand.xml.domain.InterBOSS;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
@@ -15,7 +13,10 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by juststand on 2017/4/10.
