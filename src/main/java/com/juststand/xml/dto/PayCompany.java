@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
  * Created by juststand on 2017/4/10.
  */
 public class PayCompany {
+
     private String payCompanyId;
     private String action;
 
