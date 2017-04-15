@@ -1,4 +1,4 @@
-package com.juststand.xml.dto;
+package com.juststand.xml.businessvo;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;

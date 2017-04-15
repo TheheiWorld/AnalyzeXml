@@ -1,12 +1,12 @@
-package com.juststand.xml.dto;
-
-import javax.xml.bind.annotation.XmlElement;
+package com.juststand.xml.model;
 
 /**
- * Created by juststand on 2017/4/10.
+ * Created by juststand on 2017/4/15.
  */
-public class ProductOrder {
+public class ProductOrderInfoModel {
 
+    private long id;
+    private long orderInfoReqModelId;
     private String productOrderNumber;
     private String productID;
     private String siCode;
@@ -17,8 +17,26 @@ public class ProductOrder {
     private String contactPhone;
     private String description;
     private String serviceLevelID;
+    private String productOrderChargeCode;
+    private long productOrderChargeValue;
+    private String operationSubTypeId;
 
-    @XmlElement(name = "ProductOrderNumber")
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getOrderInfoReqModelId() {
+        return orderInfoReqModelId;
+    }
+
+    public void setOrderInfoReqModelId(long orderInfoReqModelId) {
+        this.orderInfoReqModelId = orderInfoReqModelId;
+    }
+
     public String getProductOrderNumber() {
         return productOrderNumber;
     }
@@ -27,7 +45,6 @@ public class ProductOrder {
         this.productOrderNumber = productOrderNumber;
     }
 
-    @XmlElement(name = "ProductID")
     public String getProductID() {
         return productID;
     }
@@ -36,7 +53,6 @@ public class ProductOrder {
         this.productID = productID;
     }
 
-    @XmlElement(name = "SICode")
     public String getSiCode() {
         return siCode;
     }
@@ -45,7 +61,6 @@ public class ProductOrder {
         this.siCode = siCode;
     }
 
-    @XmlElement(name = "ProductSpecNumber")
     public String getProductSpecNumber() {
         return productSpecNumber;
     }
@@ -54,7 +69,6 @@ public class ProductOrder {
         this.productSpecNumber = productSpecNumber;
     }
 
-    @XmlElement(name = "AccessNumber")
     public String getAccessNumber() {
         return accessNumber;
     }
@@ -63,7 +77,6 @@ public class ProductOrder {
         this.accessNumber = accessNumber;
     }
 
-    @XmlElement(name = "PriAccessNumber")
     public String getPriAccessNumber() {
         return priAccessNumber;
     }
@@ -72,7 +85,6 @@ public class ProductOrder {
         this.priAccessNumber = priAccessNumber;
     }
 
-    @XmlElement(name = "Linkman")
     public String getLinkman() {
         return linkman;
     }
@@ -81,7 +93,6 @@ public class ProductOrder {
         this.linkman = linkman;
     }
 
-    @XmlElement(name = "ContactPhone")
     public String getContactPhone() {
         return contactPhone;
     }
@@ -90,7 +101,6 @@ public class ProductOrder {
         this.contactPhone = contactPhone;
     }
 
-    @XmlElement(name = "Description")
     public String getDescription() {
         return description;
     }
@@ -99,7 +109,6 @@ public class ProductOrder {
         this.description = description;
     }
 
-    @XmlElement(name = "ServiceLevelID")
     public String getServiceLevelID() {
         return serviceLevelID;
     }
@@ -108,10 +117,36 @@ public class ProductOrder {
         this.serviceLevelID = serviceLevelID;
     }
 
+    public String getProductOrderChargeCode() {
+        return productOrderChargeCode;
+    }
+
+    public void setProductOrderChargeCode(String productOrderChargeCode) {
+        this.productOrderChargeCode = productOrderChargeCode;
+    }
+
+    public long getProductOrderChargeValue() {
+        return productOrderChargeValue;
+    }
+
+    public void setProductOrderChargeValue(long productOrderChargeValue) {
+        this.productOrderChargeValue = productOrderChargeValue;
+    }
+
+    public String getOperationSubTypeId() {
+        return operationSubTypeId;
+    }
+
+    public void setOperationSubTypeId(String operationSubTypeId) {
+        this.operationSubTypeId = operationSubTypeId;
+    }
+
     @Override
     public String toString() {
-        return "ProductOrder{" +
-                "productOrderNumber='" + productOrderNumber + '\'' +
+        return "ProductOrderInfoModel{" +
+                "id=" + id +
+                ", orderInfoReqModelId=" + orderInfoReqModelId +
+                ", productOrderNumber='" + productOrderNumber + '\'' +
                 ", productID='" + productID + '\'' +
                 ", siCode='" + siCode + '\'' +
                 ", productSpecNumber='" + productSpecNumber + '\'' +
@@ -121,6 +156,9 @@ public class ProductOrder {
                 ", contactPhone='" + contactPhone + '\'' +
                 ", description='" + description + '\'' +
                 ", serviceLevelID='" + serviceLevelID + '\'' +
+                ", productOrderChargeCode='" + productOrderChargeCode + '\'' +
+                ", productOrderChargeValue=" + productOrderChargeValue +
+                ", operationSubTypeId='" + operationSubTypeId + '\'' +
                 '}';
     }
 }

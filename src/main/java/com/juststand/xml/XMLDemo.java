@@ -1,14 +1,14 @@
 package com.juststand.xml;
 
+import com.juststand.xml.businessvo.*;
+import com.juststand.xml.businessvo.InterBOSS;
 import com.juststand.xml.createData.CreateData;
-import com.juststand.xml.dto.InterBOSS;
+import com.juststand.xml.createData.DataFactory;
 import com.juststand.xml.messagevo.*;
-import com.juststand.xml.model.CustomerInfoModel;
-import com.juststand.xml.model.ExtInfoModel;
-import com.juststand.xml.model.KeyPersonModel;
+import com.juststand.xml.messagevo.SvcCont;
+import com.juststand.xml.model.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.dom4j.Document;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
 
@@ -16,9 +16,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by juststand on 2017/4/10.
@@ -120,4 +125,179 @@ public class XMLDemo {
             System.out.println("文件已存在");
         }
     }
+
+    @Test
+    public void toXML () {
+        // 获取数据
+        CreateData data = new CreateData();
+        OrderInfoReqModel orderInfoReqModel = data.getOrderInfoReqModel();
+
+        // 创建OrderInfoReq 对象
+        OrderInfoReq orderInfoReq = new OrderInfoReq();
+        orderInfoReq.setOrderSourceID(orderInfoReqModel.getOrderSourceID());
+        orderInfoReq.setCustomerNumber(orderInfoReqModel.getCustomerNumber());
+
+        // 创建OrderInfo对象 并给其属性赋值
+        OrderInfo orderInfo = new OrderInfo();
+        POOrderBusinesses poOrderBusinesses = new POOrderBusinesses();
+        poOrderBusinesses.setOperationSubTypeID(orderInfoReqModel.getOperationSubTypeID());
+        orderInfo.setPoOrderBusinesses(poOrderBusinesses);
+
+        POOrderCharge poOrderCharge = new POOrderCharge();
+        poOrderCharge.setPoOrderChargeCode(orderInfoReqModel.getPoOrderChargeCode());
+        poOrderCharge.setPoOrderChargeValue(orderInfoReqModel.getPoOrderChargeValue());
+        orderInfo.setPoOrderCharge(poOrderCharge);
+
+        POAttachment poAttachment = new POAttachment();
+        try {
+            BeanUtils.copyProperties(poAttachment,orderInfoReqModel);
+            orderInfo.setPoAttachment(poAttachment);
+
+            POAudit poAudit = new POAudit();
+            poAudit.setAuditDesc(orderInfoReqModel.getAuditDesc());
+            poAudit.setAuditor(orderInfoReqModel.getAuditor());
+            poAudit.setAuditTime(orderInfoReqModel.getAuditTime());
+            orderInfo.setPoAudit(poAudit);
+
+            ContactorInfo contactorInfo = new ContactorInfo();
+            BeanUtils.copyProperties(contactorInfo,orderInfoReqModel);
+            orderInfo.setContactorInfo(contactorInfo);
+
+            BeanUtils.copyProperties(orderInfo,orderInfoReqModel);
+
+            // 集合属性
+            long orderInfoReqModelId = orderInfoReqModel.getId();
+            List<POOrderRatePolicyModel> poOrderRatePolicyModels = data.getPoOrderRatePolicyModels(orderInfoReqModelId);
+            List<POOrderRatePolicy> poOrderRatePolicies = new ArrayList<POOrderRatePolicy>();
+            if (poOrderRatePolicyModels != null && poOrderRatePolicyModels.size() > 0) {
+                for (POOrderRatePolicyModel poOrderRatePolicyModel : poOrderRatePolicyModels) {
+                    POOrderRatePolicy policy = new POOrderRatePolicy();
+                    BeanUtils.copyProperties(policy,poOrderRatePolicyModel);
+
+                    long poOrderRatePolicyModelId = poOrderRatePolicyModel.getId();
+                    List<RatePlanModel> ratePlanModels = data.getRatePlanModels(poOrderRatePolicyModelId);
+                    if (ratePlanModels != null && ratePlanModels.size() > 0) {
+                        List<RatePlan> ratePlans = new ArrayList<RatePlan>();
+                        for (RatePlanModel ratePlanModel : ratePlanModels) {
+                            RatePlan ratePlan = new RatePlan();
+                            BeanUtils.copyProperties(ratePlan,ratePlanModel);
+
+                            List<ProductOrderICBModel> productOrderICBModels = data.getProductOrderICBModels(ratePlanModel);
+                            List<ProductOrderICB> productOrderICBS = forProductOrderICB(productOrderICBModels);
+                            ratePlan.setProductOrderICBs(productOrderICBS);
+                            ratePlans.add(ratePlan);
+                        }
+                        policy.setRatePlans(ratePlans);
+                    }
+                    poOrderRatePolicies.add(policy);
+                }
+            }
+            orderInfo.setPoOrderRatePolicys(poOrderRatePolicies);
+
+            List<ProductOrderInfoModel> productOrderInfoModels = data.getProductOrderInfoModels(orderInfoReqModelId);
+            List<ProductOrderInfo> productOrderInfos = new ArrayList<ProductOrderInfo>();
+            if (productOrderInfoModels != null && productOrderInfoModels.size() > 0) {
+                for (ProductOrderInfoModel productOrderInfoModel : productOrderInfoModels) {
+                    ProductOrderInfo info = new ProductOrderInfo();
+                    ProductOrder order = new ProductOrder();
+                    BeanUtils.copyProperties(order,productOrderInfoModel);
+                    info.setProductOrder(order);
+
+                    ProductOrderCharge charge = new ProductOrderCharge();
+                    BeanUtils.copyProperties(charge,productOrderInfoModel);
+                    info.setProductOrderCharge(charge);
+
+                    ProductOrderBusinesses productOrderBusinesses = new ProductOrderBusinesses();
+                    productOrderBusinesses.setOperationSubTypeId(productOrderInfoModel.getOperationSubTypeId());
+                    info.setProductOrderBusinesses(productOrderBusinesses);
+
+                    long productOrderInfoModelId = productOrderInfoModel.getId();
+                    List<ProductOrderRatePlanModel> ratePlanModels = data.getProductOrderRatePlanModels(productOrderInfoModelId);
+                    if (ratePlanModels != null && ratePlanModels.size() > 0) {
+                        List<ProductOrderRatePlan> ratePlans = new ArrayList<ProductOrderRatePlan>();
+                        for (ProductOrderRatePlanModel ratePlanModel : ratePlanModels) {
+                            ProductOrderRatePlan ratePlan = new ProductOrderRatePlan();
+                            BeanUtils.copyProperties(ratePlan,ratePlanModel);
+
+                            List<ProductOrderICBModel> icbModels = data.getProductOrderICBModels(ratePlanModel);
+                            List<ProductOrderICB> productOrderICBS = forProductOrderICB(icbModels);
+                            ratePlan.setProductOrderICBs(productOrderICBS);
+                            ratePlans.add(ratePlan);
+                        }
+                        info.setProductOrderRatePlans(ratePlans);
+                    }
+
+                    List<PayCompanyModel> payCompanyModels = data.getPayCompanyModels(productOrderInfoModelId);
+                    if (payCompanyModels != null && payCompanyModels.size() > 0) {
+                        ArrayList<PayCompany> companies = new ArrayList<PayCompany>();
+                        for (PayCompanyModel payCompanyModel : payCompanyModels) {
+                            PayCompany company = new PayCompany();
+                            BeanUtils.copyProperties(company,payCompanyModel);
+                            companies.add(company);
+                        }
+                        info.setPayCompanys(companies);
+                    }
+
+                    List<ProductOrderCharacterModel> characterModels = data.getProductOrderCharacterModels(productOrderInfoModelId);
+                    if (characterModels != null && characterModels.size() > 0) {
+                        List<ProductOrderCharacter> characters = new ArrayList<ProductOrderCharacter>();
+                        for (ProductOrderCharacterModel characterModel : characterModels) {
+                            ProductOrderCharacter character = new ProductOrderCharacter();
+                            BeanUtils.copyProperties(character,characterModel);
+                            characters.add(character);
+                        }
+                        info.setProductOrderCharacters(characters);
+                    }
+                    productOrderInfos.add(info);
+                }
+            }
+
+            orderInfo.setProductOrders(productOrderInfos);
+            orderInfoReq.setOrderInfo(orderInfo);
+            InterBOSS interBOSS = new InterBOSS();
+            com.juststand.xml.businessvo.SvcCont svcCont = new com.juststand.xml.businessvo.SvcCont();
+            svcCont.setOrderInfoReq(orderInfoReq);
+            interBOSS.setSvcCont(svcCont);
+
+            String fileName = "C:\\Users\\juststand\\Desktop\\BusinessTwo.xml";
+            voToXml(interBOSS,fileName);
+
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<ProductOrderICB> forProductOrderICB (List<ProductOrderICBModel> productOrderICBModels)
+            throws InvocationTargetException, IllegalAccessException {
+        List<ProductOrderICB> productOrderICBS = new ArrayList<ProductOrderICB>();
+        if (productOrderICBModels != null && productOrderICBModels.size() > 0) {
+            for (ProductOrderICBModel productOrderICBModel : productOrderICBModels) {
+                ProductOrderICB productOrderICB = new ProductOrderICB();
+                BeanUtils.copyProperties(productOrderICB,productOrderICBModel);
+                productOrderICBS.add(productOrderICB);
+            }
+        }
+        return productOrderICBS;
+    }
+
+    @Test
+    public void test () {
+        try {
+            Object data = DataFactory.createData("com.juststand.xml.model.ProductOrderICBModel");
+            System.out.println(data);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
